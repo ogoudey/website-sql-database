@@ -1,28 +1,24 @@
-from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
+from flask import Flask, jsonify
 
 import database_api as db_api
 import auth
-# --- App ---
-app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # lock this down to your frontend domain later
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
+app = Flask(__name__)
 
-
-# --- API ---
 @app.get("/api/nodes")
-def get_nodes(nodes=Depends(db_api.get_nodes), key=Depends(auth.verify_key)):
-    return nodes
+def get_nodes():
+    auth.verify_key()
+    return jsonify(db_api.get_nodes())
 
 @app.get("/api/edges")
-def get_edges(edges=Depends(db_api.get_edges), key=Depends(auth.verify_key)):
-    return edges
+def get_edges():
+    auth.verify_key()
+    return jsonify(db_api.get_edges())
 
 @app.get("/api/graph")
-def get_graph(graph=Depends(db_api.get_graph), key=Depends(auth.verify_key)):
-    return graph
+def get_graph():
+    auth.verify_key()
+    return jsonify(db_api.get_graph())
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)

@@ -37,3 +37,4 @@ def get_graph():
     cursor.execute("SELECT * FROM edges")
     edges = cursor.fetchall()
     return {"nodes": nodes, "edges": edges}
+
