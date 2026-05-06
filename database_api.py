@@ -2,9 +2,9 @@ import mysql.connector
 
 # --- Config ---
 DB_CONFIG = {
-    "host": "myproject.db",
-    "user": "youruser",
-    "password": "yourpassword",
+    "host": "vlanet.db",
+    "user": "oling",
+    "password": "w!gwp%6*g4$G!",
     "database": "mydb",
 }
 
