@@ -9,16 +9,6 @@ DB_CONFIG = {
 }
 
 
-# --- App ---
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # lock this down to your frontend domain later
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
-
 
 def get_db():
     conn = mysql.connector.connect(**DB_CONFIG)
@@ -26,3 +16,24 @@ def get_db():
         yield conn
     finally:
         conn.close()
+
+def get_nodes():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM nodes")
+    return cursor.fetchall()
+
+def get_edges():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM edges")
+    return cursor.fetchall()
+
+def get_graph():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM nodes")
+    nodes = cursor.fetchall()
+    cursor.execute("SELECT * FROM edges")
+    edges = cursor.fetchall()
+    return {"nodes": nodes, "edges": edges}

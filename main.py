@@ -1,9 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException, Security
-from fastapi.security.api_key import APIKeyHeader
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-import database_api as db
-
+import database_api as db_api
+import auth
 # --- App ---
 app = FastAPI()
 
@@ -14,35 +13,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Auth ---
-
-API_KEY = "poppoppop"
-api_key_header = APIKeyHeader(name="X-API-Key")
-
-def verify_key(key: str = Security(api_key_header)):
-    if key != API_KEY:
-        raise HTTPException(status_code=403, detail="Invalid API key")
-    return key
 
 # --- API ---
-
 @app.get("/api/nodes")
-def get_nodes(db=Depends(db.get_db), key=Depends(verify_key)):
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM nodes")
-    return cursor.fetchall()
+def get_nodes(nodes=Depends(db_api.get_nodes), key=Depends(auth.verify_key)):
+    return nodes
 
 @app.get("/api/edges")
-def get_edges(db=Depends(db.get_db), key=Depends(verify_key)):
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM edges")
-    return cursor.fetchall()
+def get_edges(edges=Depends(db_api.get_edges), key=Depends(auth.verify_key)):
+    return edges
 
 @app.get("/api/graph")
-def get_graph(db=Depends(db.get_db), key=Depends(verify_key)):
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM nodes")
-    nodes = cursor.fetchall()
-    cursor.execute("SELECT * FROM edges")
-    edges = cursor.fetchall()
-    return {"nodes": nodes, "edges": edges}
+def get_graph(graph=Depends(db_api.get_graph), key=Depends(auth.verify_key)):
+    return graph
