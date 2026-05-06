@@ -5,7 +5,7 @@ DB_CONFIG = {
     "host": "vlanet.db",
     "user": "oling",
     "password": "w!gwp%6*g4$G!",
-    "database": "mydb",
+    "database": "initvlanet",
 }
 
 
