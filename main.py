@@ -21,4 +21,4 @@ def get_graph():
     return jsonify(db_api.get_graph())
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=80)
