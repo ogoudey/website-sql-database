@@ -5,7 +5,7 @@ import auth
 
 app = Flask(__name__)
 
-@app.get("/vlanet/api/nodes")
+@app.get("/api/nodes")
 def get_nodes():
     auth.verify_key()
     return jsonify(db_api.get_nodes())
@@ -15,7 +15,7 @@ def get_edges():
     auth.verify_key()
     return jsonify(db_api.get_edges())
 
-@app.get("/vlanet/api/graph")
+@app.get("/api/graph")
 def get_graph():
     print(f"Hit!")
     auth.verify_key()
