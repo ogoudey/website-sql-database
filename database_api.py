@@ -8,26 +8,24 @@ DB_CONFIG = {
     "database": "initvlanet",
 }
 
-
-
 def get_db():
-    conn = mysql.connector.connect(**DB_CONFIG)
-    try:
-        yield conn
-    finally:
-        conn.close()
+    return mysql.connector.connect(**DB_CONFIG)
 
 def get_nodes():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM nodes")
-    return cursor.fetchall()
+    result = cursor.fetchall()
+    db.close()
+    return result
 
 def get_edges():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM edges")
-    return cursor.fetchall()
+    result = cursor.fetchall()
+    db.close()
+    return result
 
 def get_graph():
     db = get_db()
@@ -36,5 +34,5 @@ def get_graph():
     nodes = cursor.fetchall()
     cursor.execute("SELECT * FROM edges")
     edges = cursor.fetchall()
+    db.close()
     return {"nodes": nodes, "edges": edges}
-
