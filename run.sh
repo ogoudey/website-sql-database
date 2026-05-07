@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cd /home/private/database
+cd /home/protected/database
 source .venv/bin/activate
 python main.py
