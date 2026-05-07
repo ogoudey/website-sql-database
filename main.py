@@ -10,7 +10,7 @@ def get_nodes():
     auth.verify_key()
     return jsonify(db_api.get_nodes())
 
-@app.get("/vlanet/api/edges")
+@app.get("/api/edges")
 def get_edges():
     auth.verify_key()
     return jsonify(db_api.get_edges())
