@@ -1,5 +1,3 @@
 #!/bin/sh
-
-cd /home/protected/database
-source .venv/bin/activate
-python main.py
+source /home/protected/database/.venv/bin/activate
+exec python /home/protected/database/main.py
