@@ -104,9 +104,10 @@ def handle_host_update(cursor, host, lan_id):
     return cursor.lastrowid
 
 
-def handle_agents(cursor, agents, host_id):
-    # agents is a list of strings or dicts {"name": ..., "description": ...}
-    for agent in agents:
+def handle_agents(cursor, manifest, host_id):
+    incoming_names = []
+    # manifest is a list of strings or dicts {"name": ..., "description": ...}
+    for agent in manifest:
         if isinstance(agent, dict):
             agent_name = agent.get('name')
             agent_desc = agent.get('description')
@@ -115,6 +116,7 @@ def handle_agents(cursor, agents, host_id):
             agent_desc = None
 
         metadata = json.dumps({"description": agent_desc}) if agent_desc else None
+        incoming_names.append(agent_name)
 
         cursor.execute(
             "SELECT id FROM nodes WHERE name = %s AND type = 'agent'",
@@ -134,6 +136,22 @@ def handle_agents(cursor, agents, host_id):
                 "INSERT INTO nodes (name, type, parent_id, metadata) VALUES (%s, 'agent', %s, %s)",
                 (agent_name, host_id, metadata)
             )
+    # prune agents not appearing in this manifest
+    if incoming_names:
+        placeholders = ','.join(['%s'] * len(incoming_names))
+        cursor.execute(
+            f"""DELETE FROM nodes
+                WHERE type = 'agent'
+                AND parent_id = %s
+                AND name NOT IN ({placeholders})""",
+            (host_id, *incoming_names)
+        )
+    else:
+        # incoming agents list was empty — remove all agents on this host
+        cursor.execute(
+            "DELETE FROM nodes WHERE type = 'agent' AND parent_id = %s",
+            (host_id,)
+        )
 
 def get_graph():
     db = get_db()
