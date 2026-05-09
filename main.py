@@ -21,7 +21,7 @@ def get_graph():
     auth.verify_key()
     return jsonify(db_api.get_graph())
 
-@app.route('api/host', methods=['POST'])
+@app.route('/api/host', methods=['POST'])
 def post_host():
     data = request.get_json()
     agents   = data.get('agents', [])
