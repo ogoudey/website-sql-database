@@ -1,5 +1,4 @@
-from flask import Flask, jsonify
-import request
+from flask import Flask, jsonify, request
 
 import database_api as db_api
 import auth

@@ -2,8 +2,6 @@ import mysql.connector
 import json
 import os
 
-
-
 # --- Config ---
 DB_CONFIG = {
     "host": "vlanet.db",
