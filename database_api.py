@@ -70,7 +70,6 @@ def handle_lan(cursor, lan_name, la_id):
     )
     return cursor.lastrowid
 
-
 def handle_host_update(cursor, host, lan_id):
     # host is either a plain name string or a dict {"name": ..., "version": ...}
     if isinstance(host, dict):
@@ -102,7 +101,6 @@ def handle_host_update(cursor, host, lan_id):
         (host_name, lan_id, metadata)
     )
     return cursor.lastrowid
-
 
 def handle_agents(cursor, manifest, host_id):
     incoming_names = []
@@ -162,3 +160,38 @@ def get_graph():
     edges = cursor.fetchall()
     db.close()
     return {"nodes": nodes, "edges": edges}
+
+def clean_database():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Find all host nodes with no parent
+    cursor.execute("""
+        SELECT id FROM nodes
+        WHERE type = 'host'
+          AND parent_id IS NULL
+    """)
+    orphaned_hosts = [row['id'] for row in cursor.fetchall()]
+
+    if not orphaned_hosts:
+        return 0
+
+    fmt = ','.join(['%s'] * len(orphaned_hosts))
+
+    # Delete related edges first (FK integrity)
+    cursor.execute(f"""
+        DELETE FROM edges
+        WHERE source_id IN ({fmt})
+           OR target_id IN ({fmt})
+    """, orphaned_hosts + orphaned_hosts)
+
+    # Delete the orphaned host nodes
+    cursor.execute(f"""
+        DELETE FROM nodes
+        WHERE id IN ({fmt})
+    """, orphaned_hosts)
+
+    db.commit()
+    cursor.close()
+
+    return len(orphaned_hosts)
