@@ -169,7 +169,10 @@ def clean_database():
     cursor.execute("""
         SELECT id FROM nodes
         WHERE type = 'host'
-          AND parent_id IS NULL
+          AND (
+            parent_id IS NULL
+            OR id NOT IN (SELECT DISTINCT parent_id FROM nodes WHERE parent_id IS NOT NULL)
+          )
     """)
     orphaned_hosts = [row['id'] for row in cursor.fetchall()]
 
