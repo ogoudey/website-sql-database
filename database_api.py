@@ -36,6 +36,16 @@ def get_edges():
     db.close()
     return result
 
+def get_graph():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM nodes")
+    nodes = cursor.fetchall()
+    cursor.execute("SELECT * FROM edges")
+    edges = cursor.fetchall()
+    db.close()
+    return {"nodes": nodes, "edges": edges}
+
 def handle_la(cursor, la_name):
     cursor.execute(
         "SELECT id FROM nodes WHERE name = %s AND type = 'local_area'",
@@ -153,15 +163,7 @@ def handle_agents(cursor, manifest, host_id):
             (host_id,)
         )
 
-def get_graph():
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM nodes")
-    nodes = cursor.fetchall()
-    cursor.execute("SELECT * FROM edges")
-    edges = cursor.fetchall()
-    db.close()
-    return {"nodes": nodes, "edges": edges}
+
 
 def clean_database():
     db = get_db()
