@@ -108,12 +108,14 @@ def handle_agents(cursor, manifest, host_id):
     for agent in manifest:
         if isinstance(agent, dict):
             agent_name = agent.get('name')
-            agent_desc = agent.get('description')
+            agent_status = agent.get('status')
+            agent_message = agent.get('message')
         else:
             agent_name = agent
-            agent_desc = None
+            agent_status = None
+            agent_message = None
 
-        metadata = json.dumps({"description": agent_desc}) if agent_desc else None
+        metadata = json.dumps({"status": agent_status, "message": agent_message}) if agent_status and agent_message else None
         incoming_names.append(agent_name)
 
         cursor.execute(

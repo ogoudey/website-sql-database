@@ -17,7 +17,6 @@ def get_edges():
 
 @app.get("/api/graph")
 def get_graph():
-    print(f"Hit!")
     auth.verify_key()
     return jsonify(db_api.get_graph())
 
