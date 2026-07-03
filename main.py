@@ -5,6 +5,10 @@ import auth
 
 app = Flask(__name__)
 
+####################
+#      VLANET      #
+####################
+
 @app.get("/api/nodes")
 def get_nodes():
     auth.verify_key()
@@ -44,6 +48,36 @@ def post_host():
         db.close()
 
     return jsonify({"status": "ok"}), 200
+
+############################
+# GAME SERVER INTERACTION  #
+############################
+
+@app.get("/api/game")
+def get_game():
+    auth.verify_key()
+    data = request.get_json()
+    event   = data.get('event')
+    game_name   = data.get('game_name')
+    player_name   = data.get('player_name')
+    match event:
+        case "start_game":
+            db = db_api.get_db()
+            cursor = db.cursor(dictionary=True)
+            introductory_narrative  = db_api.handle_start_game(cursor, game_name, player_name)
+            db.commit()
+            return jsonify({"introductory_narrative": introductory_narrative})
+        case "end_game":
+            db = db_api.get_db()
+            cursor = db.cursor(dictionary=True)
+            db_api.handle_end_game(cursor, game_name, player_name)
+            db.commit()
+            return jsonify({"status": "ok"})
+        case _:
+            return jsonify({"error": str("Event not found!")}), 500
+
+    
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)

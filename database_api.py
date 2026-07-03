@@ -163,6 +163,44 @@ def handle_agents(cursor, manifest, host_id):
             (host_id,)
         )
 
+def handle_start_game(cursor, game: str, player: str):
+    cursor.execute(
+        "SELECT introductory_message, ongoing_states FROM games WHERE game_name = %s FOR UPDATE",
+        (game,)
+    )
+    row = cursor.fetchone()
+    if row is None:
+        raise ValueError(f"Unknown game: {game!r}")
+
+    introductory_message, ongoing_states_raw = row
+    ongoing_states = json.loads(ongoing_states_raw) if ongoing_states_raw else {}
+
+    ongoing_states[player] = "started"  # or whatever your initial state value is
+
+    cursor.execute(
+        "UPDATE games SET ongoing_states = %s WHERE game_name = %s",
+        (json.dumps(ongoing_states), game)
+    )
+
+    return introductory_message
+
+def handle_end_game(cursor, game: str, player: str):
+    cursor.execute(
+        "SELECT ongoing_states FROM games WHERE game_name = %s FOR UPDATE",
+        (game,)
+    )
+    row = cursor.fetchone()
+    if row is None:
+        raise ValueError(f"Unknown game: {game!r}")
+
+    ongoing_states = json.loads(row[0]) if row[0] else {}
+    ongoing_states.pop(player, None)  # no-op if player wasn't in there
+
+    cursor.execute(
+        "UPDATE games SET ongoing_states = %s WHERE game_name = %s",
+        (json.dumps(ongoing_states), game)
+    )
+
 
 
 def clean_database():
