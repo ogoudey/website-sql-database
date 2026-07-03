@@ -53,7 +53,7 @@ def post_host():
 # GAME SERVER INTERACTION  #
 ############################
 
-@app.route("/api/game")
+@app.route("/api/game", methods=['POST'])
 def post_game():
     auth.verify_key()
     data = request.get_json()
