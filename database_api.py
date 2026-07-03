@@ -171,11 +171,9 @@ def handle_start_game(cursor, game: str, player: str):
     row = cursor.fetchone()
     if row is None:
         raise ValueError(f"Unknown game: {game!r}")
-    introductory_message, ongoing_states_raw = row
-    try:
-        ongoing_states = json.loads(ongoing_states_raw) if ongoing_states_raw else {}
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Bad JSON in ongoing_states: {ongoing_states_raw!r}") from e
+    introductory_message = row["introductory_message"]
+    ongoing_states_raw = row["ongoing_states"]
+    ongoing_states = json.loads(ongoing_states_raw) if ongoing_states_raw else {}
 
     ongoing_states[player] = "started"  # or whatever your initial state value is
 
