@@ -193,9 +193,12 @@ def handle_end_game(cursor, game: str, player: str):
     if row is None:
         raise ValueError(f"Unknown game: {game!r}")
 
-    ongoing_states = json.loads(row[0]) if row[0] else {}
-    ongoing_states.pop(player, None)  # no-op if player wasn't in there
-
+    ongoing_states_raw = row["ongoing_states"]
+    ongoing_states = json.loads(ongoing_states_raw) if ongoing_states_raw else {}
+    try:
+        ongoing_states[player] = "finished"
+    except Exception as e:
+        print(f"Could not set {ongoing_states}[{player}] to finished")
     cursor.execute(
         "UPDATE games SET ongoing_states = %s WHERE game_name = %s",
         (json.dumps(ongoing_states), game)
